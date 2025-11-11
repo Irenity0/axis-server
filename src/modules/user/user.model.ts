@@ -1,44 +1,26 @@
-import mongoose, { Schema } from "mongoose"
+import mongoose from "mongoose"
 import bcrypt from "bcryptjs"
 import { IUser } from "../../types"
 
-const userSchema = new Schema<IUser>(
+const userSchema = new mongoose.Schema<IUser>(
   {
-    name: {
-      type: String,
-      required: [true, "Name is required"],
-      trim: true,
-    },
-    email: {
-      type: String,
-      required: [true, "Email is required"],
-      unique: true,
-      lowercase: true,
-      trim: true,
-    },
-    password: {
-      type: String,
-      required: [true, "Password is required"],
-      minlength: 6,
-      select: false,
-    }
+    name: { type: String, required: true, trim: true },
+    email: { type: String, required: true, unique: true, lowercase: true, trim: true },
+    password: { type: String, required: true, minlength: 6, select: false },
   },
-  {
-    timestamps: true,
-  },
+  { timestamps: true }
 )
 
-// Hash password 
+// Hash password before saving
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next()
-
-  const saltRounds = Number.parseInt(process.env.BCRYPT_SALT_ROUNDS || "12")
+  const saltRounds = parseInt(process.env.BCRYPT_SALT_ROUNDS || "12")
   this.password = await bcrypt.hash(this.password, saltRounds)
   next()
 })
 
-// Compare password method
-userSchema.methods.comparePassword = async function (candidatePassword: string): Promise<boolean> {
+// Compare password
+userSchema.methods.comparePassword = function (candidatePassword: string) {
   return bcrypt.compare(candidatePassword, this.password)
 }
 
