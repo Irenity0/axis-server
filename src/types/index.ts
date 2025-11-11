@@ -34,3 +34,18 @@ export interface IHabit extends Document {
   createdAt: Date;
   updatedAt: Date;
 }
+
+
+export interface AuthRequest extends Request {
+  user?: {
+    id: string
+    email: string
+  }
+}
+
+export interface ApiResponse<T = any> {
+  success: boolean
+  message: string
+  data?: T
+  error?: string
+}
