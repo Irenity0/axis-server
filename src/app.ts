@@ -29,7 +29,7 @@ app.get("/", (req, res) => {
     success: true,
     message: "Axis server uwu",
   })
-})
+}) 
 
 // Global error handler
 app.use((error: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
