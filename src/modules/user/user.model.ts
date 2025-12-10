@@ -11,16 +11,17 @@ const userSchema = new mongoose.Schema<IUser>(
   { timestamps: true }
 )
 
-// Hash password before saving
+// Hash password 
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next()
-  const saltRounds = parseInt(process.env.BCRYPT_SALT_ROUNDS || "12")
+
+  const saltRounds = Number.parseInt(process.env.BCRYPT_SALT_ROUNDS || "12")
   this.password = await bcrypt.hash(this.password, saltRounds)
   next()
 })
 
-// Compare password
-userSchema.methods.comparePassword = function (candidatePassword: string) {
+// Compare password method
+userSchema.methods.comparePassword = async function (candidatePassword: string): Promise<boolean> {
   return bcrypt.compare(candidatePassword, this.password)
 }
 

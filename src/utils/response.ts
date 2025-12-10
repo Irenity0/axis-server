@@ -16,3 +16,18 @@ export const sendResponse = <T>(
 
   return res.status(statusCode).json(response)
 }
+
+export const sendError = (
+  res: Response,
+  statusCode: number,
+  message: string,
+  error?: string
+): Response => {
+  const response: ApiResponse = {
+    success: false,
+    message,
+    ...(error && { error })
+  }
+
+  return res.status(statusCode).json(response)
+}
