@@ -1,7 +1,10 @@
 import express, { Application, Request, Response } from 'express';
+import tasksRoutes from "./modules/tasks/tasks.routes"
 const app : Application = express();
+import cors from "cors"
 
 app.use(express.json())
+app.use(cors());
 app.use(express.urlencoded({ extended: true }))
 
 // Catch invalid JSON
@@ -23,6 +26,8 @@ app.get("/health", (req, res) => {
     timestamp: new Date().toISOString(),
   })
 })
+
+app.use("/api/tasks", tasksRoutes);
 
 app.get("/", (req, res) => {
   res.status(200).json({

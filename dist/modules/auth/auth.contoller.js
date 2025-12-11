@@ -12,37 +12,60 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.login = void 0;
-const bcryptjs_1 = __importDefault(require("bcryptjs"));
-const validation_1 = require("../../utils/validation");
+exports.logout = exports.login = void 0;
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const response_1 = require("../../utils/response");
 const user_model_1 = require("../user/user.model");
+const generateToken = (payload) => {
+    const jwtSecret = process.env.JWT_SECRET;
+    const jwtExpiresIn = process.env.JWT_EXPIRES_IN || "7d";
+    const signOptions = {
+        expiresIn: jwtExpiresIn,
+    };
+    return jsonwebtoken_1.default.sign(payload, jwtSecret, signOptions);
+};
 const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        // 1. Validate request body
-        const parseResult = validation_1.loginSchema.safeParse(req.body);
-        if (!parseResult.success) {
-            return (0, response_1.sendResponse)(res, 400, false, "Invalid input", parseResult.error.format());
-        }
-        const { email, password } = parseResult.data;
-        // 2. Find me
-        const user = yield user_model_1.User.findOne({ email });
+        const { email, password } = req.body;
+        // Find user and include password
+        const user = yield user_model_1.User.findOne({ email }).select("+password");
         if (!user) {
-            return (0, response_1.sendResponse)(res, 401, false, "Invalid email or password");
+            return (0, response_1.sendError)(res, 401, "Invalid email or password");
         }
-        // 3. Compare passwords
-        const isMatch = yield bcryptjs_1.default.compare(password, user.password);
-        if (!isMatch) {
-            return (0, response_1.sendResponse)(res, 401, false, "Invalid email or password");
+        // Check password
+        const isPasswordValid = yield user.comparePassword(password);
+        if (!isPasswordValid) {
+            return (0, response_1.sendError)(res, 401, "Invalid email or password");
         }
-        // 4. res
+        // Generate JWT token
+        const token = generateToken({ id: user._id });
+        // Set cookie
+        res.cookie("token", token, {
+            httpOnly: true,
+            sameSite: "none",
+            secure: true,
+        });
         return (0, response_1.sendResponse)(res, 200, true, "Login successful", {
-            name: user.name,
-            email: user.email,
+            user: {
+                id: user._id,
+                name: user.name,
+                email: user.email
+            },
+            token,
         });
     }
     catch (error) {
-        return (0, response_1.sendResponse)(res, 500, false, "Server error", error.message);
+        return (0, response_1.sendError)(res, 500, "Login failed", error.message);
     }
 });
 exports.login = login;
+const logout = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        res.clearCookie("token");
+        return (0, response_1.sendResponse)(res, 200, true, "Logout successful");
+    }
+    catch (error) {
+        return (0, response_1.sendError)(res, 500, "Logout failed", error.message);
+    }
+});
+exports.logout = logout;

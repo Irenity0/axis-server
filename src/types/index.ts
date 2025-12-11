@@ -1,11 +1,12 @@
 import { Document } from "mongoose";
 
 export interface IUser extends Document {
-  _id: string;
-  email: string;
   name: string;
+  email: string;
   password: string;
   createdAt: Date;
+  updatedAt: Date;
+  comparePassword(candidatePassword: string): Promise<boolean>;
 }
 
 export interface ITask extends Document {
@@ -35,17 +36,16 @@ export interface IHabit extends Document {
   updatedAt: Date;
 }
 
-
 export interface AuthRequest extends Request {
   user?: {
-    id: string
-    email: string
-  }
+    id: string;
+    email: string;
+  };
 }
 
 export interface ApiResponse<T = any> {
-  success: boolean
-  message: string
-  data?: T
-  error?: string
+  success: boolean;
+  message: string;
+  data?: T;
+  error?: string;
 }

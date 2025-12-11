@@ -20,18 +20,20 @@ const userSchema = new mongoose_1.default.Schema({
     email: { type: String, required: true, unique: true, lowercase: true, trim: true },
     password: { type: String, required: true, minlength: 6, select: false },
 }, { timestamps: true });
-// Hash password before saving
+// Hash password 
 userSchema.pre("save", function (next) {
     return __awaiter(this, void 0, void 0, function* () {
         if (!this.isModified("password"))
             return next();
-        const saltRounds = parseInt(process.env.BCRYPT_SALT_ROUNDS || "12");
+        const saltRounds = Number.parseInt(process.env.BCRYPT_SALT_ROUNDS || "12");
         this.password = yield bcryptjs_1.default.hash(this.password, saltRounds);
         next();
     });
 });
-// Compare password
+// Compare password method
 userSchema.methods.comparePassword = function (candidatePassword) {
-    return bcryptjs_1.default.compare(candidatePassword, this.password);
+    return __awaiter(this, void 0, void 0, function* () {
+        return bcryptjs_1.default.compare(candidatePassword, this.password);
+    });
 };
 exports.User = mongoose_1.default.model("User", userSchema);
