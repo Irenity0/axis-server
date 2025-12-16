@@ -39,6 +39,13 @@ app.get("/", (req, res) => {
   })
 }) 
 
+app.use(/.*/, (req, res) => {
+  res.status(404).json({
+    success: false,
+    message: "Route not found",
+  })
+})
+
 // Global error handler
 app.use((error: any, req: express.Request, res: express.Response) => {
   console.error("Global Error:", error)
