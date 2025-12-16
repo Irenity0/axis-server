@@ -5,19 +5,24 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon src/server.ts"
+    "dev": "nodemon src/server.ts",
+    "build": "tsc",
+    "lint": "npx eslint ./src"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "packageManager": "pnpm@10.15.0",
   "devDependencies": {
+    "@eslint/js": "^9.39.2",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.5",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^24.10.0",
+    "eslint": "^9.39.2",
     "nodemon": "^3.1.10",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.50.0"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",

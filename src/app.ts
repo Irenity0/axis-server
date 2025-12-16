@@ -1,10 +1,13 @@
-import express, { Application, Request, Response } from 'express';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import express, { Application } from 'express';
 import tasksRoutes from "./modules/tasks/tasks.routes"
 const app : Application = express();
 import cors from "cors"
 
 app.use(express.json())
-app.use(cors());
+app.use(cors({
+  origin: ["https://projectaxis.vercel.app"]
+}));
 app.use(express.urlencoded({ extended: true }))
 
 // Catch invalid JSON
@@ -37,7 +40,7 @@ app.get("/", (req, res) => {
 }) 
 
 // Global error handler
-app.use((error: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+app.use((error: any, req: express.Request, res: express.Response) => {
   console.error("Global Error:", error)
   res.status(500).json({
     success: false,

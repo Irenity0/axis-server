@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Request, Response } from "express";
-import bcrypt from "bcryptjs";
 import jwt, { SignOptions } from "jsonwebtoken";
 import { sendError, sendResponse } from "../../utils/response";
 import { User } from "../user/user.model";
@@ -25,7 +26,6 @@ export const login = async (req: Request, res: Response) => {
     if (!user) {
       return sendError(res, 401, "Invalid email or password");
     }
-
     // Check password
     const isPasswordValid = await user.comparePassword(password);
     if (!isPasswordValid) {
